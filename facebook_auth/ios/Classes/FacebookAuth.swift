@@ -90,15 +90,39 @@ class FacebookAuth: NSObject {
         
         let viewController: UIViewController = (mainWindow?.rootViewController)!
         
-        loginManager.logIn(permissions: permissions, from: viewController, handler: { (result,error)->Void in
-            if error != nil{
-                self.finishWithError(errorCode: "FAILED", message: error!.localizedDescription)
-            }else if result!.isCancelled{
+        let config = LoginConfiguration(
+            permissions: permissions, tracking: .enabled, nonce: UUID().uuidString
+            
+
+        )
+        
+        
+        print("xnxx.com")
+       
+        loginManager.logIn(viewController: viewController, configuration: config!) { loginResult in
+            // Do something with loginResult
+            switch loginResult {
+               case .failed(let error):
+                self.finishWithError(errorCode: "FAILED", message: error.localizedDescription)     
+            case .cancelled:
                 self.finishWithError(errorCode: "CANCELLED", message: "User has cancelled login with facebook")
-            }else{
-                self.finishWithResult(data:self.getAccessToken(accessToken:  result!.token! ))
-            }
-        })
+            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
+                self.finishWithResult(data:self.getAccessToken(accessToken:  accessToken! ))
+               }
+            
+        }
+        
+        
+       
+//        loginManager.logIn(permissions: permissions, from: viewController, handler: { (result,error)->Void in
+//            if error != nil{
+//                self.finishWithError(errorCode: "FAILED", message: error!.localizedDescription)
+//            }else if result!.isCancelled{
+//                self.finishWithError(errorCode: "CANCELLED", message: "User has cancelled login with facebook")
+//            }else{
+//                self.finishWithResult(data:self.getAccessToken(accessToken:  result!.token! ))
+//            }
+//        })
     }
     
     
